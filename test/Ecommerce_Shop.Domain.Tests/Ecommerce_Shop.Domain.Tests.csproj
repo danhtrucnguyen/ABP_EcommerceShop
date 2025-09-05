@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Ecommerce_Shop</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Ecommerce_Shop.Domain\Ecommerce_Shop.Domain.csproj" />
+    <ProjectReference Include="..\Ecommerce_Shop.TestBase\Ecommerce_Shop.TestBase.csproj" />
+  </ItemGroup>
+
+</Project>
