@@ -55,6 +55,8 @@ public class Ecommerce_ShopDbContext :
     #endregion
     public DbSet<Entities.Product> Products { get; set; }
 
+    public DbSet<Entities.Category> Categories { get; set; }
+
     public Ecommerce_ShopDbContext(DbContextOptions<Ecommerce_ShopDbContext> options)
         : base(options)
     {
@@ -90,7 +92,22 @@ public class Ecommerce_ShopDbContext :
             b.ToTable(Ecommerce_ShopConsts.DbTablePrefix + "Products", Ecommerce_ShopConsts.DbSchema);
             b.ConfigureByConvention();
             b.Property(x => x.Name).IsRequired().HasMaxLength(128);
+            b.Property(x => x.Description).HasMaxLength(1024);
+            b.Property(x => x.Price).HasColumnType("numeric(18,2)");
             b.HasIndex(x => x.Name);
+
+            b.HasOne(p => p.Category)
+            .WithMany()                        // không cần collection ở Category
+            .HasForeignKey(p => p.CategoryId)
+            .OnDelete(DeleteBehavior.SetNull);
+            b.HasIndex(p => p.CategoryId);
+        });
+
+        builder.Entity<Entities.Category>(b =>
+        {
+            b.ToTable(Ecommerce_ShopConsts.DbTablePrefix + "Categories", Ecommerce_ShopConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.Property(x => x.Name).IsRequired().HasMaxLength(64);
         });
     }
 }

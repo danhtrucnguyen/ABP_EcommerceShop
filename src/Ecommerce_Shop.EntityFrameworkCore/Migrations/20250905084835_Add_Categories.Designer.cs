@@ -3,6 +3,7 @@ using System;
 using Ecommerce_Shop.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Ecommerce_Shop.Migrations
 {
     [DbContext(typeof(Ecommerce_ShopDbContext))]
-    partial class Ecommerce_ShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250905084835_Add_Categories")]
+    partial class Add_Categories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,9 +31,6 @@ namespace Ecommerce_Shop.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -66,8 +66,7 @@ namespace Ecommerce_Shop.Migrations
                         .HasColumnName("CreatorId");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ExtraProperties")
                         .IsRequired()
@@ -88,11 +87,9 @@ namespace Ecommerce_Shop.Migrations
                         .HasColumnType("character varying(128)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("Name");
 
@@ -1873,16 +1870,6 @@ namespace Ecommerce_Shop.Migrations
                     b.HasKey("TenantId", "Name");
 
                     b.ToTable("AbpTenantConnectionStrings", (string)null);
-                });
-
-            modelBuilder.Entity("Ecommerce_Shop.Entities.Product", b =>
-                {
-                    b.HasOne("Ecommerce_Shop.Entities.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>

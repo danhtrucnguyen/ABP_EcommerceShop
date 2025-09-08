@@ -12,7 +12,9 @@ namespace Ecommerce_Shop.Entities
         public string Name { get; private set; } = default!;
         public string? Description { get; private set; }
         public decimal Price { get; private set; }
-        public Guid? CategoryId { get; private set; }
+        public Guid? CategoryId { get; set; }
+
+        public Category? Category { get; set; }
 
         private Product() { }
         public Product(Guid id, string name, decimal price, Guid? categoryId = null) : base(id)

@@ -3,6 +3,7 @@ using System;
 using Ecommerce_Shop.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Ecommerce_Shop.Migrations
 {
     [DbContext(typeof(Ecommerce_ShopDbContext))]
-    partial class Ecommerce_ShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250908022844_Add_Product_Category_Relation")]
+    partial class Add_Product_Category_Relation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,9 +31,6 @@ namespace Ecommerce_Shop.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
