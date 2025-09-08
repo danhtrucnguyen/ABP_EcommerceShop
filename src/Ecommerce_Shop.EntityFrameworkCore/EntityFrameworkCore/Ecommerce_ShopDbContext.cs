@@ -57,6 +57,8 @@ public class Ecommerce_ShopDbContext :
 
     public DbSet<Entities.Category> Categories { get; set; }
 
+    public DbSet<Entities.Customer> Customers { get; set; }
+
     public Ecommerce_ShopDbContext(DbContextOptions<Ecommerce_ShopDbContext> options)
         : base(options)
     {
@@ -97,7 +99,7 @@ public class Ecommerce_ShopDbContext :
             b.HasIndex(x => x.Name);
 
             b.HasOne(p => p.Category)
-            .WithMany()                        // không cần collection ở Category
+            .WithMany()                        
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.SetNull);
             b.HasIndex(p => p.CategoryId);
@@ -108,6 +110,16 @@ public class Ecommerce_ShopDbContext :
             b.ToTable(Ecommerce_ShopConsts.DbTablePrefix + "Categories", Ecommerce_ShopConsts.DbSchema);
             b.ConfigureByConvention();
             b.Property(x => x.Name).IsRequired().HasMaxLength(64);
+        });
+        builder.Entity<Ecommerce_Shop.Entities.Customer>(b =>
+        {
+            b.ToTable(Ecommerce_ShopConsts.DbTablePrefix + "Customers", Ecommerce_ShopConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.Property(x => x.Name).IsRequired().HasMaxLength(128);
+            b.Property(x => x.Email).IsRequired().HasMaxLength(256);
+            b.Property(x => x.Phone).HasMaxLength(32);
+            b.Property(x => x.Address).HasMaxLength(512);
+            b.HasIndex(x => x.Email).IsUnique(); // tránh trùng email
         });
     }
 }

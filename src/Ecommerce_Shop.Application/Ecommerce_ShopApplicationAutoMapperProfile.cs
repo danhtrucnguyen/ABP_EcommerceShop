@@ -14,5 +14,7 @@ public class Ecommerce_ShopApplicationAutoMapperProfile : Profile
         CreateMap<Product, ProductDto>(); CreateMap<CreateUpdateProductDto, Product>();
 
         CreateMap<Category, CategoryDto>(); CreateMap<CreateUpdateCategoryDto, Category>();
+
+        CreateMap<Customer, CustomerDto>(); CreateMap<CreateUpdateCustomerDto, Customer>();
     }
 }
