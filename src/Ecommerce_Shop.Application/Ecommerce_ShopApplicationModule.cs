@@ -1,4 +1,6 @@
-﻿using Volo.Abp.Account;
+﻿using Ecommerce_Shop.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.Account;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
@@ -18,7 +20,7 @@ namespace Ecommerce_Shop;
     typeof(AbpTenantManagementApplicationModule),
     typeof(AbpFeatureManagementApplicationModule),
     typeof(AbpSettingManagementApplicationModule)
-    )]
+)]
 public class Ecommerce_ShopApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -27,5 +29,7 @@ public class Ecommerce_ShopApplicationModule : AbpModule
         {
             options.AddMaps<Ecommerce_ShopApplicationModule>();
         });
+
+        context.Services.AddTransient<IOrderAppService, OrderAppService>();
     }
 }

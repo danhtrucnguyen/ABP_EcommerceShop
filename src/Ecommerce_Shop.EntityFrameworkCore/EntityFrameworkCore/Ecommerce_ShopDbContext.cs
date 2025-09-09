@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Ecommerce_Shop.Entities;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -58,6 +59,11 @@ public class Ecommerce_ShopDbContext :
     public DbSet<Entities.Category> Categories { get; set; }
 
     public DbSet<Entities.Customer> Customers { get; set; }
+
+    public DbSet<Entities.Order> Orders { get; set; }
+
+    public DbSet<Entities.OrderItem> OrderItems { get; set; }
+
 
     public Ecommerce_ShopDbContext(DbContextOptions<Ecommerce_ShopDbContext> options)
         : base(options)
@@ -121,5 +127,54 @@ public class Ecommerce_ShopDbContext :
             b.Property(x => x.Address).HasMaxLength(512);
             b.HasIndex(x => x.Email).IsUnique(); // tránh trùng email
         });
+        //builder.Entity<Order>(b =>
+        //{
+        //    b.ToTable(Ecommerce_ShopConsts.DbTablePrefix + "Orders", Ecommerce_ShopConsts.DbSchema);
+        //    b.ConfigureByConvention();
+        //    b.Property(x => x.Status).IsRequired().HasMaxLength(32);
+        //    b.HasOne(o => o.Customer).WithMany().HasForeignKey(o => o.CustomerId);
+        //    b.HasMany(o => o.Items).WithOne(i => i.Order).HasForeignKey(i => i.OrderId);
+        //});
+
+        //builder.Entity<OrderItem>(b =>
+        //{
+        //    b.ToTable(Ecommerce_ShopConsts.DbTablePrefix + "OrderItems", Ecommerce_ShopConsts.DbSchema);
+        //    b.ConfigureByConvention();
+        //    b.Property(x => x.Quantity).IsRequired();
+        //    b.Property(x => x.UnitPrice).HasColumnType("numeric(18,2)");
+        //    b.HasOne(i => i.Product).WithMany().HasForeignKey(i => i.ProductId);
+        //});
+
+        //builder.Entity<Order>(b =>
+        //{
+        //    b.ToTable(Ecommerce_ShopConsts.DbTablePrefix + "Orders", Ecommerce_ShopConsts.DbSchema);
+        //    b.ConfigureByConvention();
+        //    b.Property(x => x.Status).IsRequired().HasMaxLength(32);
+        //    b.HasOne(o => o.Customer).WithMany().HasForeignKey(o => o.CustomerId);
+        //    b.HasMany(o => o.Items).WithOne(i => i.Order).HasForeignKey(i => i.OrderId);
+        //});
+
+        builder.Entity<Order>(b =>
+        {
+            b.ToTable(Ecommerce_ShopConsts.DbTablePrefix + "Orders", Ecommerce_ShopConsts.DbSchema);
+            b.ConfigureByConvention();
+
+            b.Property(x => x.Status)
+             .HasConversion<string>()     // lưu enum dưới dạng text
+             .IsRequired();
+
+            b.HasOne(o => o.Customer).WithMany().HasForeignKey(o => o.CustomerId);
+            b.HasMany(o => o.Items).WithOne(i => i.Order).HasForeignKey(i => i.OrderId);
+        });
+
+        builder.Entity<OrderItem>(b =>
+        {
+            b.ToTable(Ecommerce_ShopConsts.DbTablePrefix + "OrderItems", Ecommerce_ShopConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.Property(x => x.Quantity).IsRequired();
+            b.Property(x => x.UnitPrice).HasColumnType("numeric(18,2)");
+            b.HasOne(i => i.Product).WithMany().HasForeignKey(i => i.ProductId);
+        });
+
     }
 }
