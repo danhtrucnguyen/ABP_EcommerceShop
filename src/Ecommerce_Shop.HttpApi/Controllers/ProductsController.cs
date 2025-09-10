@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 
+
 namespace Ecommerce_Shop.Controllers
 {
     [ApiController]
@@ -17,6 +18,8 @@ namespace Ecommerce_Shop.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductAppService _service;
+
+
         public ProductsController(IProductAppService service) => _service = service;
 
         [HttpGet]
@@ -39,5 +42,26 @@ namespace Ecommerce_Shop.Controllers
 
         [HttpDelete("{id:guid}")]
         public Task DeleteAsync(Guid id) => _service.DeleteAsync(id);
+
+        [HttpGet("never-ordered")]
+        public async Task<ActionResult<List<ProductDto>>> GetNeverOrderedAsync()
+        {
+            var result = await _service.GetNeverOrderedAsync();
+            return Ok(result);
+        }
+
+        [HttpGet("purchased-by-customer")]
+        public async Task<ActionResult<List<ProductDto>>> GetPurchasedByCustomerAsync(
+            [FromQuery] Guid customerId,
+            [FromQuery] DateTime fromDate,
+            [FromQuery] DateTime? toDate)
+        {
+            if (customerId == Guid.Empty)
+                return BadRequest("customerId is required");
+
+            var until = toDate ?? DateTime.MaxValue;
+            var result = await _service.GetPurchasedByCustomerAsync(customerId, fromDate, until);
+            return Ok(result);
+        }
     }
 }

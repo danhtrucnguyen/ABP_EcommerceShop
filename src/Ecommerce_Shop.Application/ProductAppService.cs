@@ -10,27 +10,36 @@ using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce_Shop
 {
     public class ProductAppService :
         CrudAppService<
-            Product,                    // Entity
-            ProductDto,                 // DTO trả về
-            Guid,                       // Kiểu khóa chính
-            PagedAndSortedResultRequestDto, // Input cho GET list
-            CreateUpdateProductDto,     // DTO tạo
-            CreateUpdateProductDto>,    // DTO cập nhật
+            Product,                    
+            ProductDto,                 
+            Guid,                       
+            PagedAndSortedResultRequestDto, 
+            CreateUpdateProductDto,     
+            CreateUpdateProductDto>,    
         IProductAppService
     {
         private readonly IRepository<Category, Guid> _categoryRepository;
-
+        private readonly IRepository<Product, Guid> _productRepo;
+        private readonly IRepository<OrderItem, Guid> _orderItemRepo;
+        private readonly IRepository<Order, Guid> _orderRepo;
         public ProductAppService(
             IRepository<Product, Guid> productRepository,
-            IRepository<Category, Guid> categoryRepository
+            IRepository<Category, Guid> categoryRepository,
+            IRepository<Product, Guid> productRepo,
+            IRepository<OrderItem, Guid> orderItemRepo,
+            IRepository<Order, Guid> orderRepo
         ) : base(productRepository)
         {
             _categoryRepository = categoryRepository;
+            _productRepo = productRepo;
+            _orderItemRepo = orderItemRepo;
+            _orderRepo = orderRepo;
         }
 
         public override async Task<ProductDto> CreateAsync(CreateUpdateProductDto input)
@@ -73,5 +82,42 @@ namespace Ecommerce_Shop
 
             return ObjectMapper.Map<Product, ProductDto>(entity);
         }
+        
+        //LINQ
+        public async Task<List<ProductDto>> GetNeverOrderedAsync()
+        {
+            var productsQ = await _productRepo.GetQueryableAsync();
+            var orderItemsQ = await _orderItemRepo.GetQueryableAsync();
+
+            var query =
+                from p in productsQ
+                where !orderItemsQ.Any(oi => oi.ProductId == p.Id)
+                select p;
+
+            var entities = await AsyncExecuter.ToListAsync(query);
+            return ObjectMapper.Map<List<Product>, List<ProductDto>>(entities);
+        }
+
+        public async Task<List<ProductDto>> GetPurchasedByCustomerAsync(Guid customerId, DateTime fromDate, DateTime toDate)
+        {
+            var productsQ = await _productRepo.GetQueryableAsync();
+            var orderItemsQ = await _orderItemRepo.GetQueryableAsync();
+            var ordersQ = await _orderRepo.GetQueryableAsync();
+
+            var query =
+                from p in productsQ
+                where orderItemsQ.Any(oi =>
+                      oi.ProductId == p.Id &&
+                      ordersQ.Any(o =>
+                           o.Id == oi.OrderId &&
+                           o.CustomerId == customerId &&
+                           o.CreationTime >= fromDate &&
+                           o.CreationTime < toDate))
+                select p;
+
+            var entities = await AsyncExecuter.ToListAsync(query);
+            return ObjectMapper.Map<List<Product>, List<ProductDto>>(entities);
+        }
     }
+
 }

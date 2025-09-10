@@ -25,6 +25,7 @@ public class Ecommerce_ShopTestBaseModule : AbpModule
         });
 
         context.Services.AddAlwaysAllowAuthorization();
+
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)

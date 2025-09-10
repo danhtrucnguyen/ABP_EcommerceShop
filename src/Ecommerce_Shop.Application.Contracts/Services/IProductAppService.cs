@@ -17,5 +17,11 @@ namespace Ecommerce_Shop.Services
         CreateUpdateProductDto,
         CreateUpdateProductDto>
     {
+        Task<List<ProductDto>> GetNeverOrderedAsync();
+
+        Task<List<ProductDto>> GetPurchasedByCustomerAsync(
+            Guid customerId,
+            DateTime fromDate,
+            DateTime toDate);
     }
 }
