@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 
 
+
 namespace Ecommerce_Shop.Controllers
 {
     [ApiController]
@@ -63,5 +64,20 @@ namespace Ecommerce_Shop.Controllers
             var result = await _service.GetPurchasedByCustomerAsync(customerId, fromDate, until);
             return Ok(result);
         }
+
+        [HttpGet("all-including-deleted")]
+        public async Task<ActionResult<List<ProductDto>>> GetAllIncludingDeletedAsync()
+        {
+            var result = await _service.GetAllIncludingDeletedAsync();
+            return Ok(result);
+        }
+
+        [HttpGet("deleted")]
+        public async Task<ActionResult<List<ProductDto>>> GetDeletedAsync()
+        {
+            var result = await _service.GetDeletedAsync();
+            return Ok(result);
+        }
+
     }
 }

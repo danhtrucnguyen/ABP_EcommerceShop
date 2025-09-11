@@ -23,5 +23,8 @@ namespace Ecommerce_Shop.Services
             Guid customerId,
             DateTime fromDate,
             DateTime toDate);
+        Task<List<ProductDto>> GetAllIncludingDeletedAsync();
+
+        Task<List<ProductDto>> GetDeletedAsync();
     }
 }

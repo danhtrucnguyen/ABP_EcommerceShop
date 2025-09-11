@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Ecommerce_Shop.Entities
 {
-    public class Product : AuditedAggregateRoot<Guid>
+    public class Product : FullAuditedAggregateRoot<Guid>  // 👈 đủ audit + soft-delete
     {
         public string Name { get; private set; } = default!;
         public string? Description { get; private set; }

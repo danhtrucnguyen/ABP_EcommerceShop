@@ -1,6 +1,7 @@
 ﻿using Ecommerce_Shop.Dtos;
 using Ecommerce_Shop.Entities;
 using Ecommerce_Shop.Services;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,8 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Data;
 using Volo.Abp.Domain.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce_Shop
 {
@@ -21,25 +22,28 @@ namespace Ecommerce_Shop
             Guid,                       
             PagedAndSortedResultRequestDto, 
             CreateUpdateProductDto,     
-            CreateUpdateProductDto>,    
+            CreateUpdateProductDto>,
         IProductAppService
     {
         private readonly IRepository<Category, Guid> _categoryRepository;
         private readonly IRepository<Product, Guid> _productRepo;
         private readonly IRepository<OrderItem, Guid> _orderItemRepo;
         private readonly IRepository<Order, Guid> _orderRepo;
+        private readonly IDataFilter _dataFilter;
         public ProductAppService(
             IRepository<Product, Guid> productRepository,
             IRepository<Category, Guid> categoryRepository,
             IRepository<Product, Guid> productRepo,
             IRepository<OrderItem, Guid> orderItemRepo,
-            IRepository<Order, Guid> orderRepo
+            IRepository<Order, Guid> orderRepo,
+            IDataFilter dataFilter
         ) : base(productRepository)
         {
             _categoryRepository = categoryRepository;
             _productRepo = productRepo;
             _orderItemRepo = orderItemRepo;
             _orderRepo = orderRepo;
+            _dataFilter = dataFilter;
         }
 
         public override async Task<ProductDto> CreateAsync(CreateUpdateProductDto input)
@@ -118,6 +122,27 @@ namespace Ecommerce_Shop
             var entities = await AsyncExecuter.ToListAsync(query);
             return ObjectMapper.Map<List<Product>, List<ProductDto>>(entities);
         }
+        public async Task<List<ProductDto>> GetAllIncludingDeletedAsync()
+        {
+            using (_dataFilter.Disable<ISoftDelete>()) // 👈 tắt filter
+            {
+                var q = await Repository.GetQueryableAsync();
+                var onlyDeleted = q.Where(p => p.IsDeleted);
+                var list = await AsyncExecuter.ToListAsync(q);
+                return ObjectMapper.Map<List<Product>, List<ProductDto>>(list);
+            }
+        }
+        public async Task<List<ProductDto>> GetDeletedAsync()
+        {
+            using (_dataFilter.Disable<ISoftDelete>())
+            {
+                var q = await Repository.GetQueryableAsync();
+                var onlyDeleted = q.Where(p => p.IsDeleted); // Product phải implement ISoftDelete
+                var list = await AsyncExecuter.ToListAsync(onlyDeleted);
+                return ObjectMapper.Map<List<Product>, List<ProductDto>>(list);
+            }
+        }
+
     }
 
 }
