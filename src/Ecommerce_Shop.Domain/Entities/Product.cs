@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ecommerce_Shop.Domain.Events;
+using System;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Ecommerce_Shop.Entities
@@ -26,6 +27,20 @@ namespace Ecommerce_Shop.Entities
             Price = price;
             Description = description;
             CategoryId = categoryId;
+        }
+
+        public void ChangePrice(decimal newPrice)
+        {
+            if (newPrice < 0)
+                throw new ArgumentOutOfRangeException(nameof(newPrice));
+
+            if (Price == newPrice)
+                return;
+
+            var old = Price;
+            Price = newPrice;
+
+            AddLocalEvent(new ProductPriceChangedEvent(Id, old, newPrice));
         }
     }
 }

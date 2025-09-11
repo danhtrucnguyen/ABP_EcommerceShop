@@ -79,5 +79,13 @@ namespace Ecommerce_Shop.Controllers
             return Ok(result);
         }
 
+        // POST /api/products/{id}/change-price
+        [HttpPost("{id:guid}/change-price")]
+        public async Task<IActionResult> ChangePrice(Guid id, [FromBody] ChangeProductPriceDto input)
+        {
+            await _service.ChangePriceAsync(id, input);
+            return NoContent();
+        }
+
     }
 }

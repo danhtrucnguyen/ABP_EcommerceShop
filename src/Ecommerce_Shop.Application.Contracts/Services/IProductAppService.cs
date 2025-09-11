@@ -26,5 +26,7 @@ namespace Ecommerce_Shop.Services
         Task<List<ProductDto>> GetAllIncludingDeletedAsync();
 
         Task<List<ProductDto>> GetDeletedAsync();
+
+        Task ChangePriceAsync(Guid id, ChangeProductPriceDto input);
     }
 }

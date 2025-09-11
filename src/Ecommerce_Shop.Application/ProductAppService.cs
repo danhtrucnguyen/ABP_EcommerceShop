@@ -12,6 +12,7 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Data;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Uow;
 
 namespace Ecommerce_Shop
 {
@@ -30,6 +31,8 @@ namespace Ecommerce_Shop
         private readonly IRepository<OrderItem, Guid> _orderItemRepo;
         private readonly IRepository<Order, Guid> _orderRepo;
         private readonly IDataFilter _dataFilter;
+        private readonly IRepository<Product, Guid> _productRepository;
+
         public ProductAppService(
             IRepository<Product, Guid> productRepository,
             IRepository<Category, Guid> categoryRepository,
@@ -124,7 +127,7 @@ namespace Ecommerce_Shop
         }
         public async Task<List<ProductDto>> GetAllIncludingDeletedAsync()
         {
-            using (_dataFilter.Disable<ISoftDelete>()) // 👈 tắt filter
+            using (_dataFilter.Disable<ISoftDelete>()) 
             {
                 var q = await Repository.GetQueryableAsync();
                 var onlyDeleted = q.Where(p => p.IsDeleted);
@@ -143,6 +146,16 @@ namespace Ecommerce_Shop
             }
         }
 
+        [UnitOfWork]
+        public virtual async Task ChangePriceAsync(Guid id, ChangeProductPriceDto input)
+        {
+            // dùng Repository của CrudAppService
+            var product = await Repository.GetAsync(id);
+
+            product.ChangePrice(input.NewPrice);   
+
+            await Repository.UpdateAsync(product, autoSave: true);
+        }
     }
 
 }
