@@ -22,5 +22,7 @@ namespace Ecommerce_Shop.Services
         Task<OrderDto> CancelAsync(Guid id);
 
         Task<OrderFormLookupsDto> GetFormLookupsAsync();
+
+        Task<OrderDto> GetOrderWithDetailsAsync(Guid id);
     }
 }

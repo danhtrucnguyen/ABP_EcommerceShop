@@ -11,6 +11,7 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 
+
 namespace Ecommerce_Shop
 {
     public class OrderAppService : ApplicationService, IOrderAppService
@@ -19,17 +20,20 @@ namespace Ecommerce_Shop
         private readonly IRepository<OrderItem, Guid> _orderItemRepo;
         private readonly IRepository<Product, Guid> _productRepo;
         private readonly IRepository<Customer, Guid> _customerRepo;
+        private readonly IRepository<Order, Guid> _orderRepository;
 
         public OrderAppService(
             IRepository<Order, Guid> orderRepo,
             IRepository<OrderItem, Guid> orderItemRepo,
             IRepository<Product, Guid> productRepo,
-            IRepository<Customer, Guid> customerRepo)
+            IRepository<Customer, Guid> customerRepo,
+            IRepository<Order, Guid> orderRepository)
         {
             _orderRepo = orderRepo;
             _orderItemRepo = orderItemRepo;
             _productRepo = productRepo;
             _customerRepo = customerRepo;
+            _orderRepository = orderRepository;
         }
 
         public async Task<PagedResultDto<OrderDto>> GetListAsync(
@@ -218,6 +222,23 @@ namespace Ecommerce_Shop
                 .ToListAsync();
 
             return new OrderFormLookupsDto { Customers = customers, Products = products };
+        }
+
+        public async Task<OrderDto> GetOrderWithDetailsAsync(Guid id)
+        {
+            var queryable = await _orderRepository.WithDetailsAsync(x => x.Items); // ABP helper
+
+            var order = await queryable
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+            {
+                throw new EntityNotFoundException(typeof(Order), id);
+            }
+
+            return ObjectMapper.Map<Order, OrderDto>(order);
         }
     }
 }

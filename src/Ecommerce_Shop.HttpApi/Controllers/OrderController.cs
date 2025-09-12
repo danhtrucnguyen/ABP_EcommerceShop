@@ -49,6 +49,9 @@ namespace Ecommerce_Shop.Controllers
         [HttpPost("{id:guid}/ship")] public Task<OrderDto> ShipAsync(Guid id) => _service.ShipAsync(id);//giao hang
         [HttpPost("{id:guid}/complete")] public Task<OrderDto> CompleteAsync(Guid id) => _service.CompleteAsync(id);//nhan hang
         [HttpPost("{id:guid}/cancel")] public Task<OrderDto> CancelAsync(Guid id) => _service.CancelAsync(id);//huy don
+
+        [HttpGet("{id}/details")]
+        public Task<OrderDto> GetOrderDetails(Guid id) => _service.GetOrderWithDetailsAsync(id);
     }
 }
 
