@@ -52,6 +52,10 @@ namespace Ecommerce_Shop.Controllers
 
         [HttpGet("{id}/details")]
         public Task<OrderDto> GetOrderDetails(Guid id) => _service.GetOrderWithDetailsAsync(id);
+
+        [HttpGet("{id:guid}/details-spec")]
+        public Task<OrderDto> GetOrderDetailsSpec(Guid id)
+            => _service.GetOrderDetailsSpecAsync(id);
     }
 }
 

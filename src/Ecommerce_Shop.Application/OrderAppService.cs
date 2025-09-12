@@ -1,6 +1,7 @@
 ﻿using Ecommerce_Shop.Dtos;
 using Ecommerce_Shop.Entities;
 using Ecommerce_Shop.Services; // <-- QUAN TRỌNG: dùng interface chuẩn
+using Ecommerce_Shop.Specifications;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -237,6 +238,25 @@ namespace Ecommerce_Shop
             {
                 throw new EntityNotFoundException(typeof(Order), id);
             }
+
+            return ObjectMapper.Map<Order, OrderDto>(order);
+        }
+
+        public async Task<OrderDto> GetOrderDetailsSpecAsync(Guid id)
+        {
+            var spec = new OrderWithDetailsSpecification(id);
+
+            // 1) áp điều kiện từ Spec (WHAT)
+            var q = (await _orderRepository.GetQueryableAsync())
+                    .Where(spec.ToExpression());
+
+            // 2) Include là HOW (data-loading) để ngoài spec theo style ABP
+            q = q.Include(o => o.Items)
+                 .ThenInclude(i => i.Product);
+
+            var order = await q.FirstOrDefaultAsync();
+            if (order is null)
+                throw new EntityNotFoundException(typeof(Order), id);
 
             return ObjectMapper.Map<Order, OrderDto>(order);
         }
