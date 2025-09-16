@@ -14,6 +14,8 @@ namespace Ecommerce_Shop.Dtos
         public string? Description { get; set; }
         public decimal Price { get; set; }
         public Guid? CategoryId { get; set; }
+
+        public int Stock { get; set; }
     }
 
     public class CreateUpdateProductDto
@@ -28,5 +30,7 @@ namespace Ecommerce_Shop.Dtos
         public string Description { get; set; }
 
         public Guid? CategoryId { get; set; }
+
+        public int Stock { get; set; }
     }
 }

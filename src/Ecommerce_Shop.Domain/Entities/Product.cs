@@ -13,6 +13,7 @@ namespace Ecommerce_Shop.Entities
 
         public Category? Category { get; set; }
 
+
         private Product() { }
         public Product(Guid id, string name, decimal price, Guid? categoryId = null) : base(id)
         {
