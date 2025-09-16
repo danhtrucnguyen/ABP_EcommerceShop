@@ -9,7 +9,11 @@ namespace Ecommerce_Shop.Dtos
 {
     public class ChangeProductPriceDto
     {
-        [Range(0, double.MaxValue)]
+        [Range(typeof(decimal), "0.01", "79228162514264337593543950335",
+             ErrorMessage = "Giá sản phẩm phải lớn hơn 0")]
         public decimal NewPrice { get; set; }
     }
+
 }
+
+

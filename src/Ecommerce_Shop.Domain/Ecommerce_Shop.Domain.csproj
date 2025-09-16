@@ -25,4 +25,12 @@
     <PackageReference Include="Volo.Abp.PermissionManagement.Domain.OpenIddict" Version="9.3.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\Admin\source\repos\Ecommerce_Shop\src\Ecommerce_Shop.Domain\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\Admin\source\repos\Ecommerce_Shop\src\Ecommerce_Shop.Domain\.editorconfig" />
+  </ItemGroup>
+
 </Project>

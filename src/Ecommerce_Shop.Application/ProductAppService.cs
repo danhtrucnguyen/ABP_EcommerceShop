@@ -2,8 +2,10 @@
 using Ecommerce_Shop.Dtos;
 using Ecommerce_Shop.Entities;
 using Ecommerce_Shop.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed; // <-- cần cho DistributedCacheEntryOptions
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +36,7 @@ namespace Ecommerce_Shop
         private readonly IRepository<Order, Guid> _orderRepo;
         private readonly IDataFilter _dataFilter;
         private readonly IDistributedCache<ProductCacheItem, Guid> _productCache;
+        private readonly ILogger<ProductAppService> _logger;
 
         public ProductAppService(
             IRepository<Product, Guid> productRepository,                
@@ -42,7 +45,8 @@ namespace Ecommerce_Shop
             IRepository<OrderItem, Guid> orderItemRepo,
             IRepository<Order, Guid> orderRepo,
             IDataFilter dataFilter,
-            IDistributedCache<ProductCacheItem, Guid> productCache
+            IDistributedCache<ProductCacheItem, Guid> productCache,
+            ILogger<ProductAppService> logger
         ) : base(productRepository)
         {
             _categoryRepository = categoryRepository;
@@ -51,6 +55,7 @@ namespace Ecommerce_Shop
             _orderRepo = orderRepo;
             _dataFilter = dataFilter;
             _productCache = productCache;
+            _logger = logger;
         }
 
         //CREATE invalidate cache
@@ -147,7 +152,7 @@ namespace Ecommerce_Shop
             };
         }
 
-        // ========= LINQ helpers =========
+        //LINQ helpers
         public async Task<List<ProductDto>> GetNeverOrderedAsync()
         {
             var productsQ = await _productRepo.GetQueryableAsync();
@@ -203,5 +208,18 @@ namespace Ecommerce_Shop
                 return ObjectMapper.Map<List<Product>, List<ProductDto>>(list);
             }
         }
+
+        //[Authorize(ECommerceShopPermissions.Products.ChangePrice)]
+        //public virtual async Task ChangePriceWithAuthAsync(Guid id, ChangeProductPriceDto input)
+        //{
+        //    var product = await Repository.GetAsync(id);
+        //    var old = product.Price;
+
+        //    product.ChangePrice(input.NewPrice);
+        //    await Repository.UpdateAsync(product, autoSave: true);
+
+        //    await _productCache.RemoveAsync(id);
+        //    _logger?.LogInformation("CACHE INVALIDATED product {ProductId} after price change {Old}->{New}", id, old, input.NewPrice);
+        //}
     }
 }
