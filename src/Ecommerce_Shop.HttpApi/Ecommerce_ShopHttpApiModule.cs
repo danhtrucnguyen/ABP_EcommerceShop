@@ -1,6 +1,7 @@
-﻿using Localization.Resources.AbpUi;
-using Ecommerce_Shop.Localization;
+﻿using Ecommerce_Shop.Localization;
+using Localization.Resources.AbpUi;
 using Volo.Abp.Account;
+using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
 using Volo.Abp.Localization;
@@ -25,6 +26,11 @@ public class Ecommerce_ShopHttpApiModule : AbpModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         ConfigureLocalization();
+        Configure<AbpAspNetCoreMvcOptions>(options =>
+        {
+            // <<< QUAN TRỌNG: trỏ tới assembly của Application module >>>
+            options.ConventionalControllers.Create(typeof(Ecommerce_ShopApplicationModule).Assembly);
+        });
     }
 
     private void ConfigureLocalization()
