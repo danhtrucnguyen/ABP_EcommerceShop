@@ -64,6 +64,8 @@ public class Ecommerce_ShopDbContext :
 
     public DbSet<Entities.OrderItem> OrderItems { get; set; }
 
+    public DbSet<Entities.Review> Reviews { get; set; }
+
 
     public Ecommerce_ShopDbContext(DbContextOptions<Ecommerce_ShopDbContext> options)
         : base(options)
@@ -176,5 +178,18 @@ public class Ecommerce_ShopDbContext :
             b.HasOne(i => i.Product).WithMany().HasForeignKey(i => i.ProductId);
         });
 
+
+        builder.Entity<Review>(b =>
+        {
+            b.ToTable("AppReview");
+            b.ConfigureByConvention();
+            b.Property(x => x.Rating).IsRequired();
+            b.Property(x => x.Title).IsRequired().HasMaxLength(200);
+            b.Property(x => x.Content).IsRequired().HasMaxLength(2000);
+
+            // CHỐT: để nullable cho 2 cột này
+            b.Property(x => x.ConcurrencyStamp).IsRequired(false);
+            b.Property(x => x.ExtraProperties).IsRequired(false);
+        });
     }
 }

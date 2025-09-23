@@ -3,6 +3,7 @@ using System;
 using Ecommerce_Shop.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,14 +13,16 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Ecommerce_Shop.Migrations
 {
     [DbContext(typeof(Ecommerce_ShopDbContext))]
-    partial class Ecommerce_ShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250923032211_AddedReview")]
+    partial class AddedReview
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("_Abp_DatabaseProvider", EfCoreDatabaseProvider.PostgreSql)
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -286,6 +289,7 @@ namespace Ecommerce_Shop.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("character varying(40)")
                         .HasColumnName("ConcurrencyStamp");
@@ -307,6 +311,7 @@ namespace Ecommerce_Shop.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("ExtraProperties")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("ExtraProperties");
 

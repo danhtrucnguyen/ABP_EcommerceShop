@@ -23,5 +23,8 @@ public class Ecommerce_ShopApplicationAutoMapperProfile : Profile
 
         CreateMap<OrderItem, OrderItemDto>()
             .ForMember(d => d.ProductName, opt => opt.MapFrom(s => s.Product != null ? s.Product.Name : null));
+
+        CreateMap<Review, ReviewDto>();
+        CreateMap<CreateUpdateReviewDto, Review>();
     }
 }

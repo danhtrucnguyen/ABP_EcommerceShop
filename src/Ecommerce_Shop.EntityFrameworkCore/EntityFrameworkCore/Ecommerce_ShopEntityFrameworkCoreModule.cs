@@ -48,16 +48,17 @@ public class Ecommerce_ShopEntityFrameworkCoreModule : AbpModule
 
         Configure<AbpDbContextOptions>(options =>
         {
-                /* The main point to change your DBMS.
-                 * See also Ecommerce_ShopMigrationsDbContextFactory for EF Core tooling. */
-            options.UseNpgsql(npgsql =>
-            {
-                npgsql.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(10),
-                    errorCodesToAdd: new[] { "40001", "40P01", "55P03" }
-                );
-            });
+            /* The main point to change your DBMS.
+             * See also Ecommerce_ShopMigrationsDbContextFactory for EF Core tooling. */
+            options.UseNpgsql();
+            //    npgsql =>
+            //{
+            //    npgsql.EnableRetryOnFailure(
+            //        maxRetryCount: 5,
+            //        maxRetryDelay: TimeSpan.FromSeconds(10),
+            //        errorCodesToAdd: new[] { "40001", "40P01", "55P03" }
+                //);
+            //});
         });
 
     }
