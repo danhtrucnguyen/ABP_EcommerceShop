@@ -4,7 +4,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Ecommerce_Shop.Entities
 {
-    public class Product : FullAuditedAggregateRoot<Guid>  // 👈 đủ audit + soft-delete
+    public class Product : FullAuditedAggregateRoot<Guid>  
     {
         public string Name { get; private set; } = default!;
         public string? Description { get; private set; }
