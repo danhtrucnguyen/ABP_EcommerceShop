@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
     <ProjectReference Include="..\..\src\Ecommerce_Shop.EntityFrameworkCore\Ecommerce_Shop.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Ecommerce_Shop.Application.Tests\Ecommerce_Shop.Application.Tests.csproj" />
     <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" Version="9.3.2" />

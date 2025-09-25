@@ -1,6 +1,7 @@
 ﻿using Ecommerce_Shop.Dtos;
 using Ecommerce_Shop.Entities;
-using Ecommerce_Shop.Services; // <-- QUAN TRỌNG: dùng interface chuẩn
+using Ecommerce_Shop.Events.Eto;
+using Ecommerce_Shop.Services; 
 using Ecommerce_Shop.Specifications;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,6 +12,8 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.EventBus.Distributed;
+using Volo.Abp.EventBus.Local;
 
 
 namespace Ecommerce_Shop
@@ -23,18 +26,24 @@ namespace Ecommerce_Shop
         private readonly IRepository<Customer, Guid> _customerRepo;
         private readonly IRepository<Order, Guid> _orderRepository;
 
+        private readonly ILocalEventBus _localEventBus;                 
+        private readonly IDistributedEventBus _distributedEventBus;
         public OrderAppService(
             IRepository<Order, Guid> orderRepo,
             IRepository<OrderItem, Guid> orderItemRepo,
             IRepository<Product, Guid> productRepo,
             IRepository<Customer, Guid> customerRepo,
-            IRepository<Order, Guid> orderRepository)
+            IRepository<Order, Guid> orderRepository,
+            ILocalEventBus localEventBus,                 
+            IDistributedEventBus distributedEventBus)
         {
             _orderRepo = orderRepo;
             _orderItemRepo = orderItemRepo;
             _productRepo = productRepo;
             _customerRepo = customerRepo;
             _orderRepository = orderRepository;
+            _localEventBus = localEventBus;               
+            _distributedEventBus = distributedEventBus;   
         }
 
         public async Task<PagedResultDto<OrderDto>> GetListAsync(
@@ -152,6 +161,19 @@ namespace Ecommerce_Shop
             }
 
             await _orderRepo.InsertAsync(order, true);
+            await _distributedEventBus.PublishAsync(new OrderCreatedEto
+            {
+                OrderId = order.Id,
+                CustomerId = order.CustomerId,
+                TotalAmount = order.TotalAmount,
+                CreatedAt = order.OrderDate,
+                Items = order.Items.Select(i => new OrderItemEto
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice
+                }).ToList()
+            });
             return await MapReloadAsync(order.Id);
         }
 
@@ -196,6 +218,13 @@ namespace Ecommerce_Shop
 
             order.Status = next;
             await _orderRepo.UpdateAsync(order, autoSave: true);
+
+            if (next == OrderStatus.Paid)
+            {
+                await _localEventBus.PublishAsync(
+                    new OrderPaidEvent(order.Id, order.TotalAmount, Clock.Now)
+                );
+            }
 
             return await MapReloadAsync(order.Id);
         }
@@ -246,11 +275,9 @@ namespace Ecommerce_Shop
         {
             var spec = new OrderWithDetailsSpecification(id);
 
-            // 1) áp điều kiện từ Spec (WHAT)
             var q = (await _orderRepository.GetQueryableAsync())
                     .Where(spec.ToExpression());
 
-            // 2) Include là HOW (data-loading) để ngoài spec theo style ABP
             q = q.Include(o => o.Items)
                  .ThenInclude(i => i.Product);
 

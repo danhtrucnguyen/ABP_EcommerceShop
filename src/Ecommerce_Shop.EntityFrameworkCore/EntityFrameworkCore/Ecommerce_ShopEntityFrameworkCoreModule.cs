@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Uow;
+using System;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,6 +12,7 @@ using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Volo.Abp.Uow;
 
 namespace Ecommerce_Shop.EntityFrameworkCore;
 
@@ -57,9 +58,11 @@ public class Ecommerce_ShopEntityFrameworkCoreModule : AbpModule
             //        maxRetryCount: 5,
             //        maxRetryDelay: TimeSpan.FromSeconds(10),
             //        errorCodesToAdd: new[] { "40001", "40P01", "55P03" }
-                //);
+            //);
             //});
+           
         });
+
 
     }
 }

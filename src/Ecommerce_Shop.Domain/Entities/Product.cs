@@ -11,7 +11,7 @@ namespace Ecommerce_Shop.Entities
         public decimal Price { get; private set; }
         public Guid? CategoryId { get; set; }
 
-        public Category? Category { get; set; }
+        public virtual Category? Category { get; set; }
 
 
         private Product() { }
