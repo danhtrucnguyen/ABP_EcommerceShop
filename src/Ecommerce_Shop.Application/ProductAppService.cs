@@ -4,7 +4,7 @@ using Ecommerce_Shop.Entities;
 using Ecommerce_Shop.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed; // <-- cần cho DistributedCacheEntryOptions
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -18,8 +18,11 @@ using Volo.Abp.Data;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Uow;
 
+using Ecommerce_Shop.Permissions;
+
 namespace Ecommerce_Shop
 {
+    [Authorize(EcommerceShopPermissions.Products.Default)]
     public class ProductAppService :
         CrudAppService<
             Product,
@@ -31,7 +34,7 @@ namespace Ecommerce_Shop
         IProductAppService
     {
         private readonly IRepository<Category, Guid> _categoryRepository;
-        private readonly IRepository<Product, Guid> _productRepo;     // dùng cho các truy vấn LINQ
+        private readonly IRepository<Product, Guid> _productRepo;
         private readonly IRepository<OrderItem, Guid> _orderItemRepo;
         private readonly IRepository<Order, Guid> _orderRepo;
         private readonly IDataFilter _dataFilter;
@@ -39,9 +42,9 @@ namespace Ecommerce_Shop
         private readonly ILogger<ProductAppService> _logger;
 
         public ProductAppService(
-            IRepository<Product, Guid> productRepository,                
+            IRepository<Product, Guid> productRepository,
             IRepository<Category, Guid> categoryRepository,
-            IRepository<Product, Guid> productRepo,                      
+            IRepository<Product, Guid> productRepo,
             IRepository<OrderItem, Guid> orderItemRepo,
             IRepository<Order, Guid> orderRepo,
             IDataFilter dataFilter,
@@ -50,7 +53,7 @@ namespace Ecommerce_Shop
         ) : base(productRepository)
         {
             _categoryRepository = categoryRepository;
-            _productRepo = productRepo;         
+            _productRepo = productRepo;
             _orderItemRepo = orderItemRepo;
             _orderRepo = orderRepo;
             _dataFilter = dataFilter;
@@ -58,7 +61,7 @@ namespace Ecommerce_Shop
             _logger = logger;
         }
 
-        //CREATE invalidate cache
+        [Authorize(EcommerceShopPermissions.Products.Create)]
         public override async Task<ProductDto> CreateAsync(CreateUpdateProductDto input)
         {
             if (input.CategoryId.HasValue)
@@ -74,13 +77,12 @@ namespace Ecommerce_Shop
             var entity = ObjectMapper.Map<CreateUpdateProductDto, Product>(input);
             await Repository.InsertAsync(entity, autoSave: true);
 
-            // clear cache
-            await _productCache.RemoveAsync(entity.Id);
+            await _productCache.RemoveAsync(entity.Id); 
 
             return ObjectMapper.Map<Product, ProductDto>(entity);
         }
 
-        //UPDATE invalidate cache
+        [Authorize(EcommerceShopPermissions.Products.Update)]
         public override async Task<ProductDto> UpdateAsync(Guid id, CreateUpdateProductDto input)
         {
             if (input.CategoryId.HasValue)
@@ -97,29 +99,34 @@ namespace Ecommerce_Shop
             ObjectMapper.Map(input, entity);
             await Repository.UpdateAsync(entity, autoSave: true);
 
-            await _productCache.RemoveAsync(id);
+            await _productCache.RemoveAsync(id); // invalidate cache
 
             return ObjectMapper.Map<Product, ProductDto>(entity);
         }
 
-        //DELETE (invalidate cache)
+        
+        [Authorize(EcommerceShopPermissions.Products.Delete)]
         [UnitOfWork]
         public override async Task DeleteAsync(Guid id)
         {
             await base.DeleteAsync(id);
-            await _productCache.RemoveAsync(id);
+            await _productCache.RemoveAsync(id); 
         }
 
+        
+        [Authorize(EcommerceShopPermissions.Products.Update)]
         [UnitOfWork]
         public virtual async Task ChangePriceAsync(Guid id, ChangeProductPriceDto input)
         {
             var product = await Repository.GetAsync(id);
-            product.ChangePrice(input.NewPrice);     
+            product.ChangePrice(input.NewPrice);
             await Repository.UpdateAsync(product, autoSave: true);
 
-            await _productCache.RemoveAsync(id);     // xoá cache sau khi đổi giá
+            await _productCache.RemoveAsync(id); 
         }
 
+       
+        [AllowAnonymous]
         public override async Task<ProductDto> GetAsync(Guid id)
         {
             var cacheItem = await _productCache.GetOrAddAsync(
@@ -152,7 +159,6 @@ namespace Ecommerce_Shop
             };
         }
 
-        //LINQ helpers
         public async Task<List<ProductDto>> GetNeverOrderedAsync()
         {
             var productsQ = await _productRepo.GetQueryableAsync();
@@ -208,18 +214,5 @@ namespace Ecommerce_Shop
                 return ObjectMapper.Map<List<Product>, List<ProductDto>>(list);
             }
         }
-
-        //[Authorize(ECommerceShopPermissions.Products.ChangePrice)]
-        //public virtual async Task ChangePriceWithAuthAsync(Guid id, ChangeProductPriceDto input)
-        //{
-        //    var product = await Repository.GetAsync(id);
-        //    var old = product.Price;
-
-        //    product.ChangePrice(input.NewPrice);
-        //    await Repository.UpdateAsync(product, autoSave: true);
-
-        //    await _productCache.RemoveAsync(id);
-        //    _logger?.LogInformation("CACHE INVALIDATED product {ProductId} after price change {Old}->{New}", id, old, input.NewPrice);
-        //}
     }
 }

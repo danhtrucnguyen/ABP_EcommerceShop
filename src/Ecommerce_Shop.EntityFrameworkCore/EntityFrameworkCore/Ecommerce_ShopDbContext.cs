@@ -187,7 +187,7 @@ public class Ecommerce_ShopDbContext :
             b.Property(x => x.Title).IsRequired().HasMaxLength(200);
             b.Property(x => x.Content).IsRequired().HasMaxLength(2000);
 
-            // CHỐT: để nullable cho 2 cột này
+          
             b.Property(x => x.ConcurrencyStamp).IsRequired(false);
             b.Property(x => x.ExtraProperties).IsRequired(false);
         });

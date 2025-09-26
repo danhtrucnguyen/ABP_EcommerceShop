@@ -1,4 +1,5 @@
 ﻿using Volo.Abp.Account;
+using Volo.Abp.Authorization;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
@@ -18,6 +19,10 @@ namespace Ecommerce_Shop;
     typeof(AbpSettingManagementApplicationContractsModule),
     typeof(AbpTenantManagementApplicationContractsModule),
     typeof(AbpObjectExtendingModule)
+)]
+
+[DependsOn(
+    typeof(AbpAuthorizationModule) 
 )]
 public class Ecommerce_ShopApplicationContractsModule : AbpModule
 {
