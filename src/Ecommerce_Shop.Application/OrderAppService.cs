@@ -1,8 +1,10 @@
 ﻿using Ecommerce_Shop.Dtos;
 using Ecommerce_Shop.Entities;
 using Ecommerce_Shop.Events.Eto;
+using Ecommerce_Shop.Permissions;
 using Ecommerce_Shop.Services; 
 using Ecommerce_Shop.Specifications;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -124,7 +126,7 @@ namespace Ecommerce_Shop
 
             return dto;
         }
-
+        [Authorize(EcommerceShopPermissions.Orders.Create)]
         public async Task<OrderDto> CreateAsync(CreateOrderDto input)
         {
             var customer = await _customerRepo.FindAsync(input.CustomerId);

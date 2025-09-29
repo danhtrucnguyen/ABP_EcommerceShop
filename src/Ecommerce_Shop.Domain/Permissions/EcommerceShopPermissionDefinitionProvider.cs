@@ -29,6 +29,12 @@ namespace Ecommerce_Shop.Permissions
             customers.AddChild(EcommerceShopPermissions.Customers.Create, L("Permission:Customers.Create"));
             customers.AddChild(EcommerceShopPermissions.Customers.Update, L("Permission:Customers.Update"));
             customers.AddChild(EcommerceShopPermissions.Customers.Delete, L("Permission:Customers.Delete"));
+
+            var orders = group.AddPermission(EcommerceShopPermissions.Orders.Default, L("Permission:Orders"));
+            orders.AddChild(EcommerceShopPermissions.Orders.Create, L("Permission:Orders.Create"));
+            orders.AddChild(EcommerceShopPermissions.Orders.Update, L("Permission:Orders.Update"));
+            orders.AddChild(EcommerceShopPermissions.Orders.Delete, L("Permission:Orders.Delete"));
+
         }
 
         private static LocalizableString L(string name) => LocalizableString.Create<Ecommerce_ShopResource>(name);
